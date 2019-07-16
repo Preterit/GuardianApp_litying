@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.sdxxtop.guardianapp.ui.widget.TitleView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leftLayoutIconIsGray="true"
+        app:titleValue="事件上报"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_E0E0E0"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.sdxxtop.guardianapp.ui.widget.GERTimeSelectView
+                android:id="@+id/time_select"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="事件总数统计"
+                android:textColor="@color/color_292929"
+                android:textSize="15sp"/>
+
+            <com.sdxxtop.guardianapp.ui.widget.CustomEventLayout
+                android:id="@+id/cel_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/layout_report_tab_bg"
+                android:orientation="horizontal">
+            </com.sdxxtop.guardianapp.ui.widget.CustomEventLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:paddingLeft="16dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:text="上报事件分类统计"
+                android:textColor="@color/color_292929"
+                android:textSize="15sp"/>
+
+
+            <com.sdxxtop.guardianapp.ui.widget.PieChartView
+                android:id="@+id/pie_chart1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:background="#FAFBFF"
+                app:pie_title="上报事件统计"/>
+
+            <com.sdxxtop.guardianapp.ui.widget.PieChartView
+                android:id="@+id/pie_chart2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="20dp"
+                android:background="#FAFBFF"
+                app:pie_title="已处理事件统计"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

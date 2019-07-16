@@ -1,0 +1,142 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.zhousaito.plugin.publishApp'
+
+android {
+    compileSdkVersion rootProject.ext.android["compileSdkVersion"]
+    defaultConfig {
+        applicationId rootProject.ext.android["applicationId"]
+        minSdkVersion rootProject.ext.android["minSdkVersion"]
+        targetSdkVersion rootProject.ext.android["targetSdkVersion"]
+        versionCode rootProject.ext.android["versionCode"]
+        versionName rootProject.ext.android["versionName"]
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+
+        ndk {
+            //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
+//            abiFilters "armeabi", "armeabi-v7a", "x86"//, "arm64-v8a", "x86", "arm64-v8a", "x86_64"
+            abiFilters "armeabi-v7a"
+//            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a"
+        }
+    }
+
+    signingConfigs {
+        signconfig {
+            storeFile file('../GrardianAppKey.keystore')
+            storePassword 'zhidian020166'
+            keyAlias 'zhidian'
+            keyPassword 'zhidian020166'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.signconfig
+        }
+
+        debug {
+            signingConfig signingConfigs.signconfig
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
+
+    //360打包时需要加入这个，否则manifest文件中有警告会停止打包
+    lintOptions {
+        abortOnError false
+    }
+}
+
+//360多渠道打包
+publishAppInfo {
+    qihuPath = "/jiagu/jiagu.jar"
+    keyStorePath = "/GrardianAppKey.keystore"
+    keyStorePass = "zhidian020166"
+    keyStoreKeyAlias = "zhidian"
+    keyStoreKeyAliasPass = "zhidian020166"
+    //这个渠道路径暂时用不上
+    channelPath = "/apk"
+    //输出的位置
+    outputPath = "/jiaguapk"
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation rootProject.ext.dependencies["androidx.appcompat"]
+    implementation rootProject.ext.dependencies["androidx.support.v4"]
+    implementation rootProject.ext.dependencies["constraintlayout"]
+    implementation rootProject.ext.dependencies["ahbottomnavigation"]
+    implementation rootProject.ext.dependencies["material"]
+    implementation rootProject.ext.dependencies["SmartRefreshLayout"]
+    implementation rootProject.ext.dependencies["SmartRefreshHeader"]
+    implementation rootProject.ext.dependencies["BaseRecyclerViewAdapterHelper"]
+    implementation rootProject.ext.dependencies["fragmentation"]
+    implementation rootProject.ext.dependencies["fragmentation-swipeback"]
+    implementation rootProject.ext.dependencies["eventbus-activity-scope"]
+    implementation rootProject.ext.dependencies["eventbus"]
+    //    implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.2.3'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'me.jessyan:autosize:1.1.2'
+    implementation('cn.qqtheme.framework:WheelPicker:1.5.0') {
+        exclude group: 'com.android.support'
+    }
+    implementation 'com.prolificinteractive:material-calendarview:1.4.3'
+    implementation 'com.timehop.stickyheadersrecyclerview:library:0.4.3'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation rootProject.ext.dependencies["junit"]
+    implementation rootProject.ext.dependencies["test.runer"]
+    implementation rootProject.ext.dependencies["gson"]
+    implementation rootProject.ext.dependencies["retrofit"]
+    implementation rootProject.ext.dependencies["converter-gson"]
+    implementation rootProject.ext.dependencies["converter-gson"]
+    implementation rootProject.ext.dependencies["adapter-rxjava"]
+    implementation rootProject.ext.dependencies["okhttp"]
+    implementation rootProject.ext.dependencies["logging.interceptor"]
+    implementation rootProject.ext.dependencies["rxandroid"]
+    implementation rootProject.ext.dependencies["logger"]
+    implementation rootProject.ext.dependencies["butterknife"]
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    annotationProcessor rootProject.ext.dependencies["butterknife-compiler"]
+    implementation rootProject.ext.dependencies["dagger"]
+    annotationProcessor rootProject.ext.dependencies["dagger-compiler"]
+    implementation 'com.amap.api:3dmap:6.8.0'
+    implementation 'com.amap.api:map2d:5.2.0'
+    implementation 'com.amap.api:search:6.5.0.1'
+//    implementation 'com.amap.api:location:4.6.0'
+    api project(path: ':faceplatform')
+    //    # 必选，可兼容市面上绝大部分设备
+    implementation 'com.github.dueeeke.dkplayer:dkplayer-java:2.5.5'
+    implementation 'com.github.dueeeke.dkplayer:dkplayer-armv7a:2.5.5'
+    //    # 可选，用于兼容一些其他的CPU架构
+    implementation 'com.github.dueeeke.dkplayer:dkplayer-armv5:2.5.5'
+    implementation 'com.github.dueeeke.dkplayer:dkplayer-arm64:2.5.5'
+    implementation 'com.github.dueeeke.dkplayer:dkplayer-x86:2.5.5'
+    implementation 'com.github.dueeeke.dkplayer:dkplayer-x86_64:2.5.5'
+    //    # 可选，里面包含StandardVideoController的实现
+    implementation 'com.github.dueeeke.dkplayer:dkplayer-ui:2.5.5'
+    implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
+    implementation 'com.github.ctiao:ndkbitmap-armv7a:0.9.21'
+    //    # Other ABIs: optional
+    implementation 'com.github.ctiao:ndkbitmap-armv5:0.9.21'
+    implementation 'com.github.ctiao:ndkbitmap-x86:0.9.21'
+    //选择器
+    implementation 'com.contrarywind:Android-PickerView:4.1.8'
+    //图表
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
+    implementation 'com.youth.banner:banner:1.4.10'
+    implementation project(path: ':picture_library')
+    implementation 'com.aliyun.ams:alicloud-android-push:3.1.4'
+    implementation 'com.aliyun.ams:alicloud-android-third-push:3.0.6@aar'
+    implementation project(path: ':videocompressor')
+}
