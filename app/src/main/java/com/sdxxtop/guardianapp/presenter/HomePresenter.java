@@ -96,6 +96,9 @@ public class HomePresenter extends RxPresenter<HomeContract.IView> implements Ho
             public void onFailure(int code, String error) {
             }
         });
+
+
+
         addSubscribe(disposable);
     }
 
