@@ -1,9 +1,13 @@
 package com.sdxxtop.guardianapp.app;
 
 
+import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
@@ -14,6 +18,7 @@ import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.alibaba.sdk.android.push.register.HuaWeiRegister;
 import com.alibaba.sdk.android.push.register.MiPushRegister;
 import com.amap.api.track.AMapTrackClient;
+import com.amap.api.track.AMapTrackService;
 import com.baidu.idl.face.platform.FaceSDKManager;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.FormatStrategy;
@@ -32,6 +37,7 @@ import com.sdxxtop.guardianapp.app.base.BaseApp;
 import com.sdxxtop.guardianapp.di.component.AppComponent;
 import com.sdxxtop.guardianapp.di.component.DaggerAppComponent;
 import com.sdxxtop.guardianapp.di.module.AppModule;
+import com.sdxxtop.guardianapp.ui.activity.PatrolRecordActivity;
 
 
 public class App extends BaseApp {
@@ -52,6 +58,8 @@ public class App extends BaseApp {
         CrashHandler.getInstance().init(this);
         initCloudChannel(this);
         initAMapTrackClient();
+        createNotification();
+        startAlarm();
     }
 
     private void initAMapTrackClient() {
@@ -173,4 +181,50 @@ public class App extends BaseApp {
             mNotificationManager.createNotificationChannel(mChannel);
         }
     }
+
+    /**
+     * 在8.0以上手机，如果app切到后台，系统会限制定位相关接口调用频率
+     * 可以在启动轨迹上报服务时提供一个通知，这样Service启动时会使用该通知成为前台Service，可以避免此限制
+     */
+    private static final String CHANNEL_ID_SERVICE_RUNNING = "CHANNEL_ID_SERVICE_RUNNING";
+    private static Notification notification;
+
+    private void createNotification() {
+        Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_SERVICE_RUNNING, "app service", NotificationManager.IMPORTANCE_LOW);
+            nm.createNotificationChannel(channel);
+            builder = new Notification.Builder(getApplicationContext(), CHANNEL_ID_SERVICE_RUNNING);
+        } else {
+            builder = new Notification.Builder(getApplicationContext());
+        }
+        Intent nfIntent = new Intent(this, PatrolRecordActivity.class);
+        nfIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        builder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0))
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("猎鹰sdk运行中")
+                .setContentText("猎鹰sdk运行中");
+        notification = builder.build();
+    }
+
+    public static Notification getNotification() {
+        if (notification != null) {
+            return notification;
+        }
+        return null;
+    }
+
+    public void startAlarm() {
+        //首先获得系统服务
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        //设置闹钟的意图，我这里是去调用一个服务，该服务功能就是获取位置并且上传
+        Intent intent = new Intent(this, AMapTrackService.class);
+        PendingIntent pendSender = PendingIntent.getService(this, 0, intent, 0);
+        am.cancel(pendSender);
+        //AlarmManager.RTC_WAKEUP ;这个参数表示系统会唤醒进程；设置的间隔时间是1分钟
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60 * 1000, pendSender);
+    }
+
 }

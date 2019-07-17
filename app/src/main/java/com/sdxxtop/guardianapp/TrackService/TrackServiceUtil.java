@@ -1,6 +1,5 @@
 package com.sdxxtop.guardianapp.TrackService;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -17,7 +16,7 @@ import com.amap.api.track.OnTrackLifecycleListener;
 import com.amap.api.track.TrackParam;
 import com.sdxxtop.guardianapp.R;
 import com.sdxxtop.guardianapp.app.App;
-import com.sdxxtop.guardianapp.ui.activity.HomeActivity;
+import com.sdxxtop.guardianapp.ui.activity.PatrolRecordActivity;
 
 /**
  * @author :  lwb
@@ -103,11 +102,14 @@ public class TrackServiceUtil {
     }
 
     public void stsrtTrackService(long serviceId, long terminalId, long trackId) {
-        if (aMapTrackClient==null)return;
+        if (aMapTrackClient == null) return;
         mTrackId = trackId;
         TrackParam trackParam = new TrackParam(serviceId, terminalId);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            trackParam.setNotification(createNotification());
+            Notification notification = App.getNotification();
+            if (notification != null) {
+                trackParam.setNotification(createNotification());
+            }
         }
         aMapTrackClient.startTrack(trackParam, onTrackListener);
     }
@@ -116,26 +118,28 @@ public class TrackServiceUtil {
      * 在8.0以上手机，如果app切到后台，系统会限制定位相关接口调用频率
      * 可以在启动轨迹上报服务时提供一个通知，这样Service启动时会使用该通知成为前台Service，可以避免此限制
      */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private Notification createNotification() {
         Notification.Builder builder;
+        NotificationManager nm = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager nm = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID_SERVICE_RUNNING, "app service", NotificationManager.IMPORTANCE_LOW);
             nm.createNotificationChannel(channel);
             builder = new Notification.Builder(mContext, CHANNEL_ID_SERVICE_RUNNING);
+
         } else {
             builder = new Notification.Builder(mContext);
         }
-
-        Intent nfIntent = new Intent(mContext, HomeActivity.class);
+        Intent nfIntent = new Intent(mContext, PatrolRecordActivity.class);
         nfIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        builder.setContentIntent(PendingIntent.getActivity(mContext, 0, nfIntent, 0))
+//FLAG_CANCEL_CURRENT ,FLAG_IMMUTABLE,FLAG_UPDATE_CURRENT
+        builder.setContentIntent(PendingIntent.getActivity(mContext, 0, nfIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(" 后台service ")
-                .setContentText(" 后台定位service启动中 ");
+                .setContentTitle("猎鹰sdk运行中")
+                .setContentText("猎鹰sdk运行中");
         Notification notification = builder.build();
-
+        notification.flags |= Notification.FLAG_ONGOING_EVENT;
+        nm.notify(100, notification);
         return notification;
     }
 
