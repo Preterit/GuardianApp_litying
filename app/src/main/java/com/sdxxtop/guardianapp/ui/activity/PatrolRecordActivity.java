@@ -515,7 +515,7 @@ public class PatrolRecordActivity extends BaseMvpActivity<PatrolPresenter> imple
         if (isMapLoad && isTrackLoad) {
             LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
             PolylineOptions polylineOptions = new PolylineOptions();
-            polylineOptions.color(Color.BLUE).width(20);
+            polylineOptions.color(Color.BLUE).width(10);
             if (points.size() > 0) {
                 // 起点
                 TrackPointBean.PointBean pointBean = points.get(0);

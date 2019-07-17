@@ -17,7 +17,6 @@ import com.sdxxtop.guardianapp.model.http.callback.IRequestCallback;
 import com.sdxxtop.guardianapp.model.http.net.Params;
 import com.sdxxtop.guardianapp.model.http.util.RxUtils;
 import com.sdxxtop.guardianapp.presenter.contract.HomeContract;
-import com.sdxxtop.guardianapp.ui.activity.HomeActivity;
 import com.sdxxtop.guardianapp.utils.SpUtil;
 import com.sdxxtop.guardianapp.utils.UIUtils;
 
@@ -85,7 +84,7 @@ public class HomePresenter extends RxPresenter<HomeContract.IView> implements Ho
                     SpUtil.putLong(Constants.SERVICE_ID, bean.getSid());
                     SpUtil.putLong(Constants.TERMINAL_ID, bean.getTid());
                     SpUtil.putLong(Constants.TRACK_ID, bean.getTrid());
-                    TrackServiceUtil util = new TrackServiceUtil((HomeActivity)mView);
+                    TrackServiceUtil util = new TrackServiceUtil();
                     util.stsrtTrackService(bean.getSid(), bean.getTid(), bean.getTrid());
 
                     handler.sendEmptyMessageDelayed(0, 1000 * 60);

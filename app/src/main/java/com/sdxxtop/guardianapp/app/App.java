@@ -13,6 +13,7 @@ import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.alibaba.sdk.android.push.register.HuaWeiRegister;
 import com.alibaba.sdk.android.push.register.MiPushRegister;
+import com.amap.api.track.AMapTrackClient;
 import com.baidu.idl.face.platform.FaceSDKManager;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.FormatStrategy;
@@ -38,6 +39,7 @@ public class App extends BaseApp {
     private static App instance;
     private static AppComponent appComponent;
     private static final String TAG = "Init";
+    private static AMapTrackClient aMapTrackClient;
 
     @Override
     public void onCreate() {
@@ -49,6 +51,19 @@ public class App extends BaseApp {
         initBaiduFace();
         CrashHandler.getInstance().init(this);
         initCloudChannel(this);
+        initAMapTrackClient();
+    }
+
+    private void initAMapTrackClient() {
+        aMapTrackClient = new AMapTrackClient(getApplicationContext());
+        aMapTrackClient.setInterval(5, 30);
+    }
+
+    public static AMapTrackClient getAMapTrackClient() {
+        if (aMapTrackClient != null) {
+            return aMapTrackClient;
+        }
+        return null;
     }
 
     private void initBaiduFace() {

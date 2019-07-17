@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
@@ -14,11 +15,9 @@ import com.amap.api.track.AMapTrackClient;
 import com.amap.api.track.ErrorCode;
 import com.amap.api.track.OnTrackLifecycleListener;
 import com.amap.api.track.TrackParam;
-import com.amap.api.track.query.entity.LocationMode;
 import com.sdxxtop.guardianapp.R;
+import com.sdxxtop.guardianapp.app.App;
 import com.sdxxtop.guardianapp.ui.activity.HomeActivity;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * @author :  lwb
@@ -26,7 +25,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  * Desc:
  */
 public class TrackServiceUtil {
-    private HomeActivity mActivity;
+    private Context mContext;
     private static final String CHANNEL_ID_SERVICE_RUNNING = "CHANNEL_ID_SERVICE_RUNNING";
     private AMapTrackClient aMapTrackClient;
 
@@ -40,17 +39,17 @@ public class TrackServiceUtil {
         public void onStartTrackCallback(int status, String msg) {
             if (status == ErrorCode.TrackListen.START_TRACK_SUCEE || status == ErrorCode.TrackListen.START_TRACK_SUCEE_NO_NETWORK) {
                 // 成功启动
-                Toast.makeText(mActivity, "启动服务成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "启动服务成功", Toast.LENGTH_SHORT).show();
                 if (aMapTrackClient != null) {
                     aMapTrackClient.setTrackId(mTrackId);
                     aMapTrackClient.startGather(onTrackListener);
                 }
             } else if (status == ErrorCode.TrackListen.START_TRACK_ALREADY_STARTED) {
                 // 已经启动
-//                Toast.makeText(mActivity, "服务已经启动", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "服务已经启动", Toast.LENGTH_SHORT).show();
             } else {
                 Log.w("TrackService", "error onStartTrackCallback, status: " + status + ", msg: " + msg);
-                Toast.makeText(mActivity,
+                Toast.makeText(mContext,
                         "error onStartTrackCallback, status: " + status + ", msg: " + msg,
                         Toast.LENGTH_LONG).show();
             }
@@ -60,10 +59,10 @@ public class TrackServiceUtil {
         public void onStopTrackCallback(int status, String msg) {
             if (status == ErrorCode.TrackListen.STOP_TRACK_SUCCE) {
                 // 成功停止
-//                Toast.makeText(mActivity, "停止服务成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "停止服务成功", Toast.LENGTH_SHORT).show();
             } else {
                 Log.w("TrackService", "error onStopTrackCallback, status: " + status + ", msg: " + msg);
-                Toast.makeText(mActivity,
+                Toast.makeText(mContext,
                         "error onStopTrackCallback, status: " + status + ", msg: " + msg,
                         Toast.LENGTH_LONG).show();
             }
@@ -72,12 +71,12 @@ public class TrackServiceUtil {
         @Override
         public void onStartGatherCallback(int status, String msg) {
             if (status == ErrorCode.TrackListen.START_GATHER_SUCEE) {
-                Toast.makeText(mActivity, "定位采集开启成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "定位采集开启成功", Toast.LENGTH_SHORT).show();
             } else if (status == ErrorCode.TrackListen.START_GATHER_ALREADY_STARTED) {
-//                Toast.makeText(mActivity, "定位采集已经开启", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "定位采集已经开启", Toast.LENGTH_SHORT).show();
             } else {
                 Log.w("TrackService", "error onStartGatherCallback, status: " + status + ", msg: " + msg);
-                Toast.makeText(mActivity,
+                Toast.makeText(mContext,
                         "error onStartGatherCallback, status: " + status + ", msg: " + msg,
                         Toast.LENGTH_LONG).show();
             }
@@ -86,10 +85,10 @@ public class TrackServiceUtil {
         @Override
         public void onStopGatherCallback(int status, String msg) {
             if (status == ErrorCode.TrackListen.STOP_GATHER_SUCCE) {
-//                Toast.makeText(mActivity, "定位采集停止成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "定位采集停止成功", Toast.LENGTH_SHORT).show();
             } else {
                 Log.w("TrackService", "error onStopGatherCallback, status: " + status + ", msg: " + msg);
-                Toast.makeText(mActivity,
+                Toast.makeText(mContext,
                         "error onStopGatherCallback, status: " + status + ", msg: " + msg,
                         Toast.LENGTH_LONG).show();
             }
@@ -98,16 +97,13 @@ public class TrackServiceUtil {
 
     private long mTrackId;
 
-    public TrackServiceUtil(HomeActivity activity) {
-        this.mActivity = activity;
-        // 不要使用Activity作为Context传入
-        aMapTrackClient = new AMapTrackClient(activity);
-        aMapTrackClient.setInterval(2, 20);
-        aMapTrackClient.setLocationMode(LocationMode.HIGHT_ACCURACY);
-        aMapTrackClient.setCacheSize(300);
+    public TrackServiceUtil() {
+        this.mContext = App.getContext();
+        aMapTrackClient = App.getAMapTrackClient();
     }
 
     public void stsrtTrackService(long serviceId, long terminalId, long trackId) {
+        if (aMapTrackClient==null)return;
         mTrackId = trackId;
         TrackParam trackParam = new TrackParam(serviceId, terminalId);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -124,29 +120,22 @@ public class TrackServiceUtil {
     private Notification createNotification() {
         Notification.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager nm = (NotificationManager) mActivity.getSystemService(NOTIFICATION_SERVICE);
-            // 通知渠道的id
-            String id = "1";
-            // 用户可以看到的通知渠道的名字.
-            CharSequence name = "智慧罗庄";
-            // 用户可以看到的通知渠道的描述
-            String description = "notification description";
-//            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_SERVICE_RUNNING, "app service", NotificationManager.IMPORTANCE_LOW);
-            NotificationChannel channel = new NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH);
-
-
+            NotificationManager nm = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_SERVICE_RUNNING, "app service", NotificationManager.IMPORTANCE_LOW);
             nm.createNotificationChannel(channel);
-            builder = new Notification.Builder(mActivity, CHANNEL_ID_SERVICE_RUNNING);
+            builder = new Notification.Builder(mContext, CHANNEL_ID_SERVICE_RUNNING);
         } else {
-            builder = new Notification.Builder(mActivity);
+            builder = new Notification.Builder(mContext);
         }
-        Intent nfIntent = new Intent(mActivity, HomeActivity.class);
+
+        Intent nfIntent = new Intent(mContext, HomeActivity.class);
         nfIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        builder.setContentIntent(PendingIntent.getActivity(mActivity, 0, nfIntent, 0))
+        builder.setContentIntent(PendingIntent.getActivity(mContext, 0, nfIntent, 0))
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(" 后台service ")
                 .setContentText(" 后台定位service启动中 ");
         Notification notification = builder.build();
+
         return notification;
     }
 

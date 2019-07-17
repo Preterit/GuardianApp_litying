@@ -92,8 +92,9 @@
             android:name="com.amap.api.v2.apikey"
             android:value="81974efe8098da9206a13898e4dc47a4"/>
         <service android:name="com.amap.api.track.AMapTrackService" />
-        <service android:name="com.amap.api.location.APSService"/>
+        <service android:name="com.amap.api.location.APSService" />
         <service android:name=".service.PatrolRecordService"/>
+        <service android:name="com.amap.api.location.APSService"/>
 
         <meta-data
             android:name="max_aspect"
