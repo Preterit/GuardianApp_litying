@@ -31,6 +31,9 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
 public class HomePresenter extends RxPresenter<HomeContract.IView> implements HomeContract.IPresenter {
+
+    private Intent intent;
+
     @Inject
     public HomePresenter() {
     }
@@ -83,16 +86,17 @@ public class HomePresenter extends RxPresenter<HomeContract.IView> implements Ho
             @Override
             public void onSuccess(TrackInfoBean bean) {
                 if (bean != null) {
-                    SpUtil.putLong(Constants.SERVICE_ID, bean.getSid());
-                    SpUtil.putLong(Constants.TERMINAL_ID, bean.getTid());
-                    SpUtil.putLong(Constants.TRACK_ID, bean.getTrid());
+                    SpUtil.putLong(Constants.SERVICE_ID, bean.getSid(), false);
+                    SpUtil.putLong(Constants.TERMINAL_ID, bean.getTid(), false);
+                    SpUtil.putLong(Constants.TRACK_ID, bean.getTrid(), false);
 
-                    Intent intent = new Intent((HomeActivity)mView, ForegroundService.class);
+                    intent = new Intent((HomeActivity)mView, ForegroundService.class);
                     ((HomeActivity)mView).startService(intent);
 //                    TrackServiceUtil util = new TrackServiceUtil();
 //                    util.stsrtTrackService(bean.getSid(), bean.getTid(), bean.getTrid());
-
-                    handler.sendEmptyMessageDelayed(0, 1000 * 60);
+                    if (handler != null) {
+                        handler.sendEmptyMessageDelayed(0, 1000 * 60);
+                    }
                 }
             }
 
@@ -100,14 +104,13 @@ public class HomePresenter extends RxPresenter<HomeContract.IView> implements Ho
             public void onFailure(int code, String error) {
             }
         });
-
-
-
         addSubscribe(disposable);
     }
 
     public void uploadingPoint() {
-        handler.sendEmptyMessageDelayed(0, 1000 * 60);
+        if (handler != null) {
+            handler.sendEmptyMessageDelayed(0, 1000 * 60);
+        }
         Params params = new Params();
         params.put("sid", SpUtil.getLong(Constants.SERVICE_ID, 0));
         params.put("tid", SpUtil.getLong(Constants.TERMINAL_ID, 0));
@@ -140,5 +143,17 @@ public class HomePresenter extends RxPresenter<HomeContract.IView> implements Ho
         Date t = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return df.format(t);
+    }
+
+    @Override
+    public void detachView() {
+        if (mView != null && intent!= null) {
+            ((HomeActivity) mView).stopService(intent);
+        }
+        if (handler != null) {
+            handler.removeMessages(0);
+            handler = null;
+        }
+        super.detachView();
     }
 }

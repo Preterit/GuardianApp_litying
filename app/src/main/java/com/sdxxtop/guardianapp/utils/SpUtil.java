@@ -106,6 +106,10 @@ public class SpUtil {
         editor.apply();
     }
 
+    private static void commitEditor(SharedPreferences.Editor editor) {
+        editor.commit();
+    }
+
     public static void putLong(String key, long value) {
         SharedPreferences sp = getSp();
         if (sp == null)
@@ -113,6 +117,20 @@ public class SpUtil {
         SharedPreferences.Editor editor = sp.edit();
         editor.putLong(key, value);
         applyEditor(editor);
+    }
+
+
+    public static void putLong(String key, long value, boolean isApply) {
+        SharedPreferences sp = getSp();
+        if (sp == null)
+            return;
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putLong(key, value);
+        if (isApply) {
+            applyEditor(editor);
+        } else  {
+            commitEditor(editor);
+        }
     }
 
     public static long getLong(String key, long defaultValue) {

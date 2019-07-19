@@ -24,6 +24,7 @@ public class ForegroundService extends Service {
 
     private static final String TAG = "ForegroundService";
     private static final int SERVICE_ID = 1;
+    private Notification notification;
 
     @Nullable
     @Override
@@ -53,24 +54,29 @@ public class ForegroundService extends Service {
                 PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                         notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 manager.createNotificationChannel(channel);
-                Notification notification = new NotificationCompat.Builder(this, "channel")
+                notification = new NotificationCompat.Builder(this, "channel")
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setWhen(System.currentTimeMillis())
                         .setTicker("GPS测试1")
-                        .setContentTitle("GPS测试标题1")
-                        .setContentText("GPS测试内容1")
+                        .setContentTitle("智慧罗庄")
+                        .setContentText("GPS 使用中")
                         .setOngoing(true)
                         .setContentIntent(pendingIntent)
                         .setAutoCancel(false)
                         .build();
                 //将service设置成前台服务，8.x退到后台会显示通知栏消息，9.0会立刻显示通知栏消息
-                Log.e(TAG, "onCreate: 服务创建了 ----" );
+                Log.e(TAG, "onCreate: 服务创建了 ----");
                 startForeground(SERVICE_ID, notification);
             }
         }
 
         TrackServiceUtil util = new TrackServiceUtil();
-        util.stsrtTrackService(SpUtil.getLong(Constants.SERVICE_ID,0),SpUtil.getLong(Constants.TERMINAL_ID,0),SpUtil.getLong(Constants.TRACK_ID,0));
+        long serviceId = SpUtil.getLong(Constants.SERVICE_ID, 0);
+        long terminalId = SpUtil.getLong(Constants.TERMINAL_ID, 0);
+        long trackId = SpUtil.getLong(Constants.TRACK_ID, 0);
+        if (notification!=null){
+            util.stsrtTrackService(serviceId, terminalId, trackId,notification);
+        }
     }
 
     public static class InnerService extends Service {

@@ -101,14 +101,15 @@ public class TrackServiceUtil {
         aMapTrackClient = App.getAMapTrackClient();
     }
 
-    public void stsrtTrackService(long serviceId, long terminalId, long trackId) {
+    public void stsrtTrackService(long serviceId, long terminalId, long trackId,Notification notification) {
         if (aMapTrackClient == null) return;
         mTrackId = trackId;
         TrackParam trackParam = new TrackParam(serviceId, terminalId);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification notification = App.getNotification();
+//            Notification notification = App.getNotification();
             if (notification != null) {
-                trackParam.setNotification(createNotification());
+                trackParam.setNotification(notification);
             }
         }
         aMapTrackClient.startTrack(trackParam, onTrackListener);
