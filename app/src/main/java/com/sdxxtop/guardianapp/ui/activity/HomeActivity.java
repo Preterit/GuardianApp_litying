@@ -2,6 +2,7 @@ package com.sdxxtop.guardianapp.ui.activity;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
@@ -19,6 +20,7 @@ import com.sdxxtop.guardianapp.model.bean.ArticleIndexBean;
 import com.sdxxtop.guardianapp.model.bean.InitBean;
 import com.sdxxtop.guardianapp.presenter.HomePresenter;
 import com.sdxxtop.guardianapp.presenter.contract.HomeContract;
+import com.sdxxtop.guardianapp.service.ForegroundService;
 import com.sdxxtop.guardianapp.ui.dialog.DownloadDialog;
 import com.sdxxtop.guardianapp.ui.fragment.DataMonitoringFragment;
 import com.sdxxtop.guardianapp.ui.fragment.HomeFragment;
@@ -93,10 +95,11 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements Home
 
     private void startPatrolService() {
 //        Logger.e("开启了服务");
-//        Intent intent = new Intent(this, PatrolRecordService.class);
-//        startService(intent);
-
         mPresenter.getLocationInfo();
+
+
+//        Intent forgroundService = new Intent(this, BackGroundService.class);
+//        startService(forgroundService);
     }
 
     private void initAHNavigation() {

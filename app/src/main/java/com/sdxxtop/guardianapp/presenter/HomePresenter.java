@@ -2,10 +2,10 @@ package com.sdxxtop.guardianapp.presenter;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 
-import com.sdxxtop.guardianapp.TrackService.TrackServiceUtil;
 import com.sdxxtop.guardianapp.app.Constants;
 import com.sdxxtop.guardianapp.base.RxPresenter;
 import com.sdxxtop.guardianapp.model.bean.ArticleIndexBean;
@@ -17,6 +17,8 @@ import com.sdxxtop.guardianapp.model.http.callback.IRequestCallback;
 import com.sdxxtop.guardianapp.model.http.net.Params;
 import com.sdxxtop.guardianapp.model.http.util.RxUtils;
 import com.sdxxtop.guardianapp.presenter.contract.HomeContract;
+import com.sdxxtop.guardianapp.service.ForegroundService;
+import com.sdxxtop.guardianapp.ui.activity.HomeActivity;
 import com.sdxxtop.guardianapp.utils.SpUtil;
 import com.sdxxtop.guardianapp.utils.UIUtils;
 
@@ -84,8 +86,11 @@ public class HomePresenter extends RxPresenter<HomeContract.IView> implements Ho
                     SpUtil.putLong(Constants.SERVICE_ID, bean.getSid());
                     SpUtil.putLong(Constants.TERMINAL_ID, bean.getTid());
                     SpUtil.putLong(Constants.TRACK_ID, bean.getTrid());
-                    TrackServiceUtil util = new TrackServiceUtil();
-                    util.stsrtTrackService(bean.getSid(), bean.getTid(), bean.getTrid());
+
+                    Intent intent = new Intent((HomeActivity)mView, ForegroundService.class);
+                    ((HomeActivity)mView).startService(intent);
+//                    TrackServiceUtil util = new TrackServiceUtil();
+//                    util.stsrtTrackService(bean.getSid(), bean.getTid(), bean.getTrid());
 
                     handler.sendEmptyMessageDelayed(0, 1000 * 60);
                 }

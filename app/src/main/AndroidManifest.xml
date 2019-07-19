@@ -39,6 +39,7 @@
     <!--用于申请获取蓝牙信息进行室内定位-->
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:name=".app.App"
@@ -51,8 +52,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:theme="@style/AppNormalTheme"
-            android:name=".ui.activity.DeviceWarnDetailActivity">
+            android:name=".ui.activity.DeviceWarnDetailActivity"
+            android:theme="@style/AppNormalTheme">
         </activity>
         <activity android:name=".ui.activity.DeviceCenterMsgActivity">
         </activity>
@@ -102,15 +103,41 @@
         </activity>
 
         <!--<meta-data-->
-            <!--android:name="com.amap.api.v2.apikey"-->
-            <!--android:value="1985905fa798941ad45e429a5bbd97e0"/>-->
+        <!--android:name="com.amap.api.v2.apikey"-->
+        <!--android:value="1985905fa798941ad45e429a5bbd97e0"/>-->
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="81974efe8098da9206a13898e4dc47a4"/>
-        <service android:name="com.amap.api.track.AMapTrackService" />
-        <service android:name="com.amap.api.location.APSService" />
-        <service android:name="com.amap.api.location.APSService"/>
-        <service android:name=".service.PatrolRecordService"/>
+
+        <service
+            android:name="com.amap.api.track.AMapTrackService"
+            android:process=":remote"/>
+        <service
+            android:name="com.amap.api.location.APSService"
+            android:process=":remote"/>
+        <service
+            android:name=".service.PatrolRecordService"
+            android:process=":remote"/>
+
+        <service
+            android:name=".service.BackGroundService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote"
+            />
+        <service
+            android:name=".service.ForegroundService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote"
+            />
+
+        <service
+            android:name=".service.ForegroundService$InnerService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote"
+            />
 
         <meta-data
             android:name="max_aspect"
